@@ -428,7 +428,7 @@ class RaftNode(threading.Thread):
                                 self._send_append_entries(next_index - 1, self.log[next_index - 1]['term'], self.log[next_index], incoming_message.sender)
                             
                             if (self.verbose):
-                                print(self._name + ": updated standing is " + str(self.match_index) + " my index: " + str(self._log_max_index()))
+                                print(self._name + ": updated standing is " + str(self.match_index) + " my index: " + str(self._log_max_index()) + " current term: "+ str(self.current_term))
 
                             # Determine the 'committable' indices
                             log_lengths = [int(i) for i in self.match_index if (i is not None)]
