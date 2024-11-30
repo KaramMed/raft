@@ -1,31 +1,32 @@
 #!/usr/bin/env python
-import time
+
 from raft import RaftNode
+import json
+import time
 
-# Create the intercommunication json 
-ip_addr = "192.168.0.29"
-comm_dict = {"node0": {"ip": ip_addr, "port": "5567"}, 
-             "node1": {"ip": ip_addr, "port": "5566"}, 
-             "node2": {"ip": ip_addr, "port": "5565"}}
+address_book_fname = 'address_book.json'
 
-# Start a few nodes
-nodes = []
-for name, address in comm_dict.items():
-    nodes.append(RaftNode(comm_dict, name))
-    nodes[-1].start()
+if __name__ == '__main__':
+    d = {"node1": {"ip": "192.168.1.1", "port": "2380"}, 
+         "node2": {"ip": "192.168.1.2", "port": "2380"}, 
+         "node3": {"ip": "192.168.1.3", "port": "2380"}}
+        
+    with open(address_book_fname, 'w') as outfile:
+        json.dump(d, outfile)
 
-# Let a leader emerge
-time.sleep(2)
+    s0 = RaftNode(address_book_fname, 'node1', 'follower')
+    #s1 = RaftNode(address_book_fname, 'node2', 'follower')
+    #s2 = RaftNode(address_book_fname, 'node3', 'follower')
 
-# Make some requests
-for val in range(5):
-    nodes[0].client_request({'val': val})
-time.sleep(5)
+    s0.start()
+    #s1.start()
+    #s2.start()
+    
 
-# Check and see what the most recent entry is
-for n in nodes:
-    print(n.check_committed_entry())
-
-# Stop all the nodes
-for n in nodes:
-    n.stop()
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        s0.stop()
+        #s1.stop()
+        #s2.stop()
