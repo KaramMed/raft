@@ -252,6 +252,10 @@ class RaftNode(threading.Thread):
 
         return
 
+    # Added: Expose the method to transition to candidate externally
+    def transition_to_candidate(self):
+        self._set_current_role('candidate')  # Transition to candidate
+
     def _candidate(self):
         ''' 
             _candidate: Nodes will start here if they have not heard the leader 
@@ -278,7 +282,7 @@ class RaftNode(threading.Thread):
         # Request for nodes to vote for you
         self._send_request_vote()
 
-        # Vote for yorself
+        # Vote for yourself
         self._send_vote(self.my_id, True)
         
         # Keep track of votes for and against you
@@ -303,6 +307,8 @@ class RaftNode(threading.Thread):
 
                         #print(self._name + ": votes for me " + str(votes_for_me))
                         #print(self._name + ": total votes " + str(total_votes))
+
+                        print(f"Accepted votes {votes_for_me} Rejected Votes {total_votes-votes_for_me}")
                             
                         # If you have a majority, promote yourself
                         if ((votes_for_me > int(old_div(self.current_num_nodes, 2))) or (self.current_num_nodes == 1)):

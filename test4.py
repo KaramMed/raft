@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from raft import RaftNode
 import json
 import time
@@ -17,20 +18,6 @@ if __name__ == '__main__':
     s0 = RaftNode(address_book_fname, 'node4', 'follower')
 
     s0.start()
-
-    s0._set_current_role('candidate')
-
-    s0._increment_term()
-
-    # Request for nodes to vote for you
-    s0._send_request_vote()
-
-    # Vote for yourself
-    s0._send_vote(s0.my_id, True)
-
-    time.sleep(2)
-
-    #s0.stop()
 
     try:
         while True:
