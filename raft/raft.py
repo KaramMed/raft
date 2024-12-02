@@ -252,9 +252,39 @@ class RaftNode(threading.Thread):
 
         return
 
-    # Added: Expose the method to transition to candidate externally
-    def transition_to_candidate(self):
-        self._set_current_role('candidate')  # Transition to candidate
+    # method to send candidate votes by attacker (with or without term increment)
+    def replay_attack(self,increment=False):
+
+        i = 0
+        if increment:
+            i = self.current_term + 1
+
+        # read vote_request and send same vote
+        json_file = "vote_request.json"
+        vote_data = ""
+        try:
+            with open(json_file, "r") as f:
+                vote_data = json.load(f)[0] 
+        except (FileNotFoundError, IndexError) as e:
+            print(e)
+            return
+        
+        message = RequestVotesMessage(
+            type_=vote_data["type"],
+            term=vote_data["term"]+i,
+            sender=vote_data["sender"],
+            direction=vote_data["direction"],
+            candidate_id=vote_data["candidate_id"],
+            last_log_index=vote_data["last_log_index"],
+            last_log_term=vote_data["last_log_term"],
+        )
+        
+        # send the message to followers
+        self._send_message(message)
+
+        # vote for yourself
+        self._send_vote(self.my_id, True)
+
 
     def _candidate(self):
         ''' 
@@ -308,7 +338,7 @@ class RaftNode(threading.Thread):
                         #print(self._name + ": votes for me " + str(votes_for_me))
                         #print(self._name + ": total votes " + str(total_votes))
 
-                        print(f"Accepted votes {votes_for_me} Rejected Votes {total_votes-votes_for_me}")
+                        print(f"Accepted votes {votes_for_me}")
                             
                         # If you have a majority, promote yourself
                         if ((votes_for_me > int(old_div(self.current_num_nodes, 2))) or (self.current_num_nodes == 1)):
@@ -676,6 +706,22 @@ class RaftNode(threading.Thread):
             last_log_term = self.last_applied_term
         )
         self._send_message(message)
+
+        # capture the message vote
+        self.capture_message_vote(message)
+
+    # message capturing
+    def capture_message_vote(self, message):
+
+        # only capture send votes from node1
+        if message.sender == '127.0.0.1:2380':
+
+            vote_data = message.to_dict()
+            json_file = "vote_request.json"
+
+            # Overwrite the JSON file with the latest vote request
+            with open(json_file, "w") as f:
+                json.dump([vote_data], f, indent=4)
 
     def _send_vote(self, candidate, vote_granted=True):
         message = RequestVotesMessage(

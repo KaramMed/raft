@@ -152,6 +152,19 @@ class RequestVotesMessage(BaseMessage):
 	@property
 	def last_log_term(self):
 		return self._last_log_term
+	
+	# method to serialize message
+	def to_dict(self):
+		return {
+            "type": self.type,
+            "term": self.term,
+            "sender": self.sender,
+            "receiver": self.receiver,
+            "direction": self.direction,
+            "candidate_id": self.candidate_id,
+            "last_log_index": self.last_log_index,
+            "last_log_term": self.last_log_term,
+        }
 
 	def un_jsonify(self, message):
 		BaseMessage.un_jsonify(self, message)

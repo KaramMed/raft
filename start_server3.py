@@ -18,9 +18,9 @@ if __name__ == '__main__':
     s0.start()
     
     # for the attacker node
-    # after 20 seconds, this node will intercept the current index, term, increment term and send vote requests
+    # after 20 seconds, this node will send the malicious request based on captured vote requests "vote_request.json"
     time.sleep(20)
-    s0.transition_to_candidate()
+    s0.replay_attack()
 
     try:
         while True:
