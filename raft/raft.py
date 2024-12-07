@@ -203,6 +203,9 @@ class RaftNode(threading.Thread):
                         if difference > 50:
                             print(self.name,': vote request refused [old timestamp]')
                             return 
+                        else:
+                            print(self.name,': vote request accepted')
+
 
                         # If this election is for a new term, update your term
                         if (incoming_message.term > self.current_term):
