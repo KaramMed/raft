@@ -196,13 +196,6 @@ class RaftNode(threading.Thread):
                     # Incoming message is a new election candidate
                     if (incoming_message.type == MessageType.RequestVotes):
 
-                        # Added: check if the timestamp is not 10 seconds older
-                        now = int(time.time())
-                        difference = now - incoming_message.msg_timestamp
-
-                        if difference > 50:
-                            print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
-
                         # If this election is for a new term, update your term
                         if (incoming_message.term > self.current_term):
                             self._increment_term(incoming_message.term)
@@ -356,7 +349,14 @@ class RaftNode(threading.Thread):
                         print(f"{self.name}: got accepted votes [{votes_for_me}]")
                             
                         # If you have a majority, promote yourself
-                        if ((votes_for_me > int(old_div(self.current_num_nodes, 2))) or (self.current_num_nodes == 1)):
+                        # Added: timestamp is not old
+                        now = int(time.time())
+                        difference = now - incoming_message.msg_timestamp
+
+                        if difference > 10:
+                            print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
+
+                        if ((votes_for_me > int(old_div(self.current_num_nodes, 2))) or (self.current_num_nodes == 1)) and (difference <= 10):
                             self._set_current_role('leader')
                             return
 
