@@ -235,11 +235,10 @@ class RaftNode(threading.Thread):
                         print(str(self.name)+": log received ",incoming_message.entries)
 
                         # add the log to the file log (received logs only)
-                        if incoming_message.receiver == self.name:
-                            log_file_path = str(self.name)+"_logs.txt"
-                            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            with open(log_file_path, "a") as file:
-                                file.write(current_time+" : "+ incoming_message.entries + "\n") 
+                        log_file_path = str(self.name)+"_logs.txt"
+                        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        with open(log_file_path, "a") as file:
+                            file.write(current_time+" : "+ incoming_message.entries + "\n") 
                         
                         # Reply false if message term is less than current_term, this is an invalid entry
                         if (incoming_message.term < self.current_term):
