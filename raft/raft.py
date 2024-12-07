@@ -197,19 +197,16 @@ class RaftNode(threading.Thread):
                     if (incoming_message.type == MessageType.RequestVotes):
 
                         # Added: check if the timestamp is not 10 seconds older
-                        '''
                         now = int(time.time())
-                        print(now, incoming_message.msg_timestamp)
                         difference = now - incoming_message.msg_timestamp
                         old_request = False
 
-                        if difference > 10:
+                        if difference > 50:
                             old_request = True
                             print(self.name,': vote request refused [old timestamp]')
-                        '''
 
                         # If this election is for a new term, update your term
-                        if (incoming_message.term > self.current_term):
+                        if (incoming_message.term > self.current_term and not old_request):
                             self._increment_term(incoming_message.term)
                             
                         # If you haven't already voted and you're less up to date than the candidate, send your vote
@@ -290,7 +287,7 @@ class RaftNode(threading.Thread):
             candidate_id=self.my_id,
             last_log_index=self.last_applied_index,
             last_log_term=self.last_applied_term,
-            #msg_timestamp=vote_data['msg_timestamp']
+            msg_timestamp=vote_data['msg_timestamp']
         )
         
         # send the message to followers
@@ -718,7 +715,7 @@ class RaftNode(threading.Thread):
             candidate_id = self.my_id, 
             last_log_index = self.last_applied_index,
             last_log_term = self.last_applied_term,
-            #msg_timestamp=datetime.now()
+            msg_timestamp= int(time.time())
         )
         self._send_message(message)
 
@@ -748,7 +745,7 @@ class RaftNode(threading.Thread):
             candidate_id = candidate, 
             last_log_index = self.last_applied_index,
             last_log_term = self.last_applied_term,
-            #msg_timestamp=datetime.now(),
+            msg_timestamp= int(time.time()),
             results = RequestVotesResults(
                 term = self.current_term,
                 vote_granted = vote_granted
