@@ -197,14 +197,17 @@ class RaftNode(threading.Thread):
                     if (incoming_message.type == MessageType.RequestVotes):
 
                         now = int(time.time())
-                        print("follower diff ==> ",now,incoming_message.msg_timestamp)
+                        difference = now - incoming_message.msg_timestamp
+                        #print("follower diff ==> ",now,incoming_message.msg_timestamp)
+                        if difference > 10:
+                            print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
 
                         # If this election is for a new term, update your term
                         if (incoming_message.term > self.current_term):
                             self._increment_term(incoming_message.term)
                             
                         # If you haven't already voted and you're less up to date than the candidate, send your vote
-                        if ((self.voted_for is None) and (incoming_message.last_log_index >= self.last_applied_index) and (incoming_message.last_log_term >= self.last_applied_term)):
+                        if ((self.voted_for is None) and (incoming_message.last_log_index >= self.last_applied_index) and (incoming_message.last_log_term >= self.last_applied_term) and difference <= 10 ):
                             self._send_vote(incoming_message.sender)
                         else: 
                             self._send_vote(incoming_message.sender, False)
@@ -355,7 +358,7 @@ class RaftNode(threading.Thread):
                         # Added: timestamp is not old
                         now = int(time.time())
                         difference = now - incoming_message.msg_timestamp
-                        print("candidate diff ==> ",now,incoming_message.msg_timestamp)
+                        #print("candidate diff ==> ",now,incoming_message.msg_timestamp)
 
                         if difference > 10:
                             print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
@@ -513,9 +516,12 @@ class RaftNode(threading.Thread):
                         # Added: message votes with timetsamp
                         now = int(time.time())
                         difference = now - incoming_message.msg_timestamp
-                        print("leader diff ==> ",now,incoming_message.msg_timestamp)
+                        #print("leader diff ==> ",now,incoming_message.msg_timestamp)
 
-                        if (incoming_message.term > self.current_term):
+                        if difference > 10:
+                            print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
+
+                        if (incoming_message.term > self.current_term and difference <= 10 ):
                             self._increment_term(incoming_message.term)
                             self._send_vote(incoming_message.sender)
                             self._set_current_role('follower')
