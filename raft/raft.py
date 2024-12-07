@@ -273,7 +273,7 @@ class RaftNode(threading.Thread):
         msg_timestamp=vote_data['msg_timestamp']
 
         # sending the actual timestamp
-        if actual_timestamp:
+        if actual_timestamp == True:
             msg_timestamp = int(time.time())
 
         message = RequestVotesMessage(
@@ -352,7 +352,7 @@ class RaftNode(threading.Thread):
                         # Added: timestamp is not old
                         now = int(time.time())
                         difference = now - incoming_message.msg_timestamp
-                        print("diff ==> ",difference)
+                        print("diff ==> ",now,incoming_message.msg_timestamp)
 
                         if difference > 10:
                             print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
