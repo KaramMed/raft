@@ -238,7 +238,7 @@ class RaftNode(threading.Thread):
                         log_file_path = str(self.name)+"_logs.txt"
                         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         with open(log_file_path, "a") as file:
-                            file.write(current_time+" : "+ incoming_message.entries + "\n") 
+                            file.write(current_time+" : "+ str(incoming_message.entries) + "\n") 
                         
                         # Reply false if message term is less than current_term, this is an invalid entry
                         if (incoming_message.term < self.current_term):
