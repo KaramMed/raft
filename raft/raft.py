@@ -233,7 +233,7 @@ class RaftNode(threading.Thread):
                     elif (incoming_message.type == MessageType.AppendEntries):
 
                         # Added: display append entry received
-                        print(self.name,": append entry received: ",incoming_message.entries)
+                        print(str(self.name)+": log received ",incoming_message.entries)
                         
                         # Reply false if message term is less than current_term, this is an invalid entry
                         if (incoming_message.term < self.current_term):
