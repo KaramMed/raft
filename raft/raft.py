@@ -199,10 +199,8 @@ class RaftNode(threading.Thread):
                         # Added: check if the timestamp is not 10 seconds older
                         now = int(time.time())
                         difference = now - incoming_message.msg_timestamp
-                        old_request = False
 
                         if difference > 50:
-                            old_request = True
                             print(self.name,': vote request refused [old timestamp]')
                             return 
 
