@@ -201,7 +201,7 @@ class RaftNode(threading.Thread):
                         difference = now - incoming_message.msg_timestamp
 
                         if difference > 50:
-                            print(self.name,': vote request from ',incoming_message.sender,' was refused [old timestamp]')
+                            print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
 
                         # If this election is for a new term, update your term
                         if (incoming_message.term > self.current_term):
@@ -353,7 +353,7 @@ class RaftNode(threading.Thread):
                         #print(self._name + ": votes for me " + str(votes_for_me))
                         #print(self._name + ": total votes " + str(total_votes))
 
-                        print(f"Accepted votes {votes_for_me}")
+                        print(f"{self.name}: got accepted votes [{votes_for_me}]")
                             
                         # If you have a majority, promote yourself
                         if ((votes_for_me > int(old_div(self.current_num_nodes, 2))) or (self.current_num_nodes == 1)):
