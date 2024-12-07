@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # for the attacker node
     # after 20 seconds, this node will send the malicious request based on captured vote requests "vote_request.json"
     #time.sleep(20)
-    s0.replay_attack(actual_timestamp=False)
+    s0.replay_attack(bypass_timestamp=False)
 
     # send malicious append entry (when not leader)
     '''

@@ -268,7 +268,7 @@ class RaftNode(threading.Thread):
         return
 
     # method to send candidate votes by attacker (with or without term increment)
-    def replay_attack(self,actual_timestamp=False):
+    def replay_attack(self,bypass_timestamp=False):
         
         i = self.current_term + 1
 
@@ -285,7 +285,7 @@ class RaftNode(threading.Thread):
         msg_timestamp=vote_data['msg_timestamp']
 
         # sending the actual timestamp
-        if actual_timestamp == True:
+        if bypass_timestamp == True:
             msg_timestamp = int(time.time())
 
         message = RequestVotesMessage(
