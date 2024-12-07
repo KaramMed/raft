@@ -19,8 +19,14 @@ if __name__ == '__main__':
     
     # for the attacker node
     # after 20 seconds, this node will send the malicious request based on captured vote requests "vote_request.json"
+    #time.sleep(20)
+    #s0.replay_attack()
+
+    # send malicious append entry (when not leader)
     time.sleep(20)
-    s0.replay_attack()
+    if s0.check_role != 'leader':
+        entry = {'term': 100, 'entry': 'Malicious Entry', 'id': 123}
+        s0._broadcast_append_entries(entry)
 
     try:
         while True:

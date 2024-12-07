@@ -1,5 +1,4 @@
 from builtins import object
-
 import time
 
 class MessageType(object):
@@ -152,6 +151,7 @@ class RequestVotesMessage(BaseMessage):
 	@property
 	def last_log_term(self):
 		return self._last_log_term
+
 	
 	# method to serialize message
 	def to_dict(self):
@@ -163,7 +163,7 @@ class RequestVotesMessage(BaseMessage):
             "direction": self.direction,
             "candidate_id": self.candidate_id,
             "last_log_index": self.last_log_index,
-            "last_log_term": self.last_log_term,
+            "last_log_term": self.last_log_term
         }
 
 	def un_jsonify(self, message):

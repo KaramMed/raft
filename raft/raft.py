@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 from __future__ import division
-
+from datetime import datetime, timedelta
 from builtins import str
 from builtins import range
 from past.utils import old_div
@@ -196,6 +196,18 @@ class RaftNode(threading.Thread):
                     # Incoming message is a new election candidate
                     if (incoming_message.type == MessageType.RequestVotes):
 
+                        # Added: check if the timestamp is not 10 seconds older
+                        '''
+                        now = int(time.time())
+                        print(now, incoming_message.msg_timestamp)
+                        difference = now - incoming_message.msg_timestamp
+                        old_request = False
+
+                        if difference > 10:
+                            old_request = True
+                            print(self.name,': vote request refused [old timestamp]')
+                        '''
+
                         # If this election is for a new term, update your term
                         if (incoming_message.term > self.current_term):
                             self._increment_term(incoming_message.term)
@@ -224,6 +236,9 @@ class RaftNode(threading.Thread):
                         
                     # Incoming message is some data to append
                     elif (incoming_message.type == MessageType.AppendEntries):
+
+                        # Added: display append entry received
+                        print(self.name,": append entry received: ",incoming_message.entries)
                         
                         # Reply false if message term is less than current_term, this is an invalid entry
                         if (incoming_message.term < self.current_term):
@@ -253,11 +268,9 @@ class RaftNode(threading.Thread):
         return
 
     # method to send candidate votes by attacker (with or without term increment)
-    def replay_attack(self,increment=False):
-
-        i = 0
-        if increment:
-            i = self.current_term + 1
+    def replay_attack(self):
+        
+        i = self.current_term + 1
 
         # read vote_request and send same vote
         json_file = "vote_request.json"
@@ -272,11 +285,12 @@ class RaftNode(threading.Thread):
         message = RequestVotesMessage(
             type_=vote_data["type"],
             term=vote_data["term"]+i,
-            sender=vote_data["sender"],
+            sender=self.my_id,
             direction=vote_data["direction"],
-            candidate_id=vote_data["candidate_id"],
-            last_log_index=vote_data["last_log_index"],
-            last_log_term=vote_data["last_log_term"],
+            candidate_id=self.my_id,
+            last_log_index=self.last_applied_index,
+            last_log_term=self.last_applied_term,
+            #msg_timestamp=vote_data['msg_timestamp']
         )
         
         # send the message to followers
@@ -464,7 +478,7 @@ class RaftNode(threading.Thread):
                                 self._send_append_entries(next_index - 1, self.log[next_index - 1]['term'], self.log[next_index], incoming_message.sender)
                             
                             if (self.verbose):
-                                print(self._name + ": updated standing is " + str(self.match_index) + " my index: " + str(self._log_max_index()) + " current term: "+ str(self.current_term))
+                                print(self._name + ": updated standing is " + str(self.match_index) + " current index: " + str(self._log_max_index()) + " current term: "+ str(self.current_term))
 
                             # Determine the 'committable' indices
                             log_lengths = [int(i) for i in self.match_index if (i is not None)]
@@ -703,18 +717,19 @@ class RaftNode(threading.Thread):
             direction = MessageDirection.Request, 
             candidate_id = self.my_id, 
             last_log_index = self.last_applied_index,
-            last_log_term = self.last_applied_term
+            last_log_term = self.last_applied_term,
+            #msg_timestamp=datetime.now()
         )
         self._send_message(message)
 
         # capture the message vote
-        self.capture_message_vote(message)
+        #self.capture_message_vote(message)
 
     # message capturing
     def capture_message_vote(self, message):
 
-        # only capture send votes from node1
-        if message.sender == '127.0.0.1:2380':
+        # only capture send votes from current node
+        if message.sender == self.my_id:
 
             vote_data = message.to_dict()
             json_file = "vote_request.json"
@@ -733,6 +748,7 @@ class RaftNode(threading.Thread):
             candidate_id = candidate, 
             last_log_index = self.last_applied_index,
             last_log_term = self.last_applied_term,
+            #msg_timestamp=datetime.now(),
             results = RequestVotesResults(
                 term = self.current_term,
                 vote_granted = vote_granted

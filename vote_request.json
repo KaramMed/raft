@@ -1,12 +1,13 @@
 [
     {
         "type": 0,
-        "term": 534,
+        "term": 251,
         "sender": "127.0.0.1:2380",
         "receiver": null,
         "direction": 0,
         "candidate_id": "127.0.0.1:2380",
-        "last_log_index": 2,
-        "last_log_term": 503
+        "last_log_index": 0,
+        "last_log_term": 1,
+        "msg_timestamp": 1733534505
     }
 ]
