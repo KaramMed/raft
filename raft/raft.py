@@ -267,6 +267,13 @@ class RaftNode(threading.Thread):
 
         return
 
+    # method to send malicious entry
+    def send_entry_attack(self,message):
+        if self.check_role != 'leader':
+            entry = {'term': self.current_term, 'entry': message, 'id': -1}
+            self._broadcast_append_entries(entry)
+    
+
     # method to send candidate votes by attacker (with or without term increment)
     def replay_attack(self,bypass_timestamp=False):
         

@@ -17,18 +17,14 @@ if __name__ == '__main__':
 
     s0.start()
     
-    # for the attacker node
+
     # after 20 seconds, this node will send the malicious request based on captured vote requests "vote_request.json"
-    #time.sleep(20)
+    time.sleep(20)
     s0.replay_attack(bypass_timestamp=False)
 
-    # send malicious append entry (when not leader)
-    '''
+    # after 20 seconds, this node will send a malicious message to the other follower nodes
     time.sleep(20)
-    if s0.check_role != 'leader':
-        entry = {'term': 100, 'entry': 'Malicious Entry', 'id': 123}
-        s0._broadcast_append_entries(entry)
-    '''
+    s0.send_entry_attack("Malicious entry")
 
     try:
         while True:
