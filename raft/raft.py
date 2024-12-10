@@ -272,7 +272,7 @@ class RaftNode(threading.Thread):
         if self.check_role != 'leader':
             entry = {'term': self.current_term, 'entry': message, 'id': -1}
             self._broadcast_append_entries(entry)
-    
+
 
     # method to send candidate votes by attacker (with or without term increment)
     def replay_attack(self,bypass_timestamp=False):
@@ -332,6 +332,11 @@ class RaftNode(threading.Thread):
 
         if(self.verbose):
             print(self._name + ': became candidate')
+            # add the log to the file log (received logs only)
+            log_file_path = str(self.name)+"_logs.txt"
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(log_file_path, "a") as file:
+                file.write(current_time+" : "+ str(self._name) + ': became candidate' + "\n") 
 
         # If you're a candidate, then this is a new term
         self._increment_term()
@@ -366,6 +371,11 @@ class RaftNode(threading.Thread):
                         #print(self._name + ": total votes " + str(total_votes))
 
                         print(f"{self.name}: got accepted votes [{votes_for_me}]")
+                        # add the log to the file log (received logs only)
+                        log_file_path = str(self.name)+"_logs.txt"
+                        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        with open(log_file_path, "a") as file:
+                            file.write(current_time+" : "+ f"{self.name}: got accepted votes [{votes_for_me}]" + "\n") 
                             
                         # If you have a majority, promote yourself
                         # Added: timestamp is not old
@@ -403,6 +413,12 @@ class RaftNode(threading.Thread):
             if ((time.time() - time_election_going) > self.election_timeout):
                 if(self.verbose):
                     print(self._name + ': election timed out')
+                    # add the log to the file log (received logs only)
+                    log_file_path = str(self.name)+"_logs.txt"
+                    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    with open(log_file_path, "a") as file:
+                        file.write(current_time+" : "+ str(self._name) + ': election timed out' + "\n") 
+                    
                 self._set_current_role('candidate')
                 return
         
@@ -430,6 +446,11 @@ class RaftNode(threading.Thread):
         
         if(self.verbose):
             print(self._name + ': became leader')
+            # add the log to the file log (received logs only)
+            log_file_path = str(self.name)+"_logs.txt"
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(log_file_path, "a") as file:
+                file.write(current_time+" : "+ str(self._name) + ': became leader' + "\n") 
 
         # First things first, send a heartbeat
         self._send_heartbeat()
@@ -500,6 +521,11 @@ class RaftNode(threading.Thread):
                             
                             if (self.verbose):
                                 print(self._name + ": updated standing is " + str(self.match_index) + " current index: " + str(self._log_max_index()) + " current term: "+ str(self.current_term))
+                                # add the log to the file log (received logs only)
+                                log_file_path = str(self.name)+"_logs.txt"
+                                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                with open(log_file_path, "a") as file:
+                                    file.write(current_time+" : "+ self._name + ": updated standing is " + str(self.match_index) + " current index: " + str(self._log_max_index()) + " current term: "+ str(self.current_term) + "\n") 
 
                             # Determine the 'committable' indices
                             log_lengths = [int(i) for i in self.match_index if (i is not None)]
@@ -533,6 +559,12 @@ class RaftNode(threading.Thread):
 
                         if difference > 10:
                             print('vote request from ',incoming_message.sender,' was refused [old timestamp]')
+                            # add the log to the file log (received logs only)
+                            log_file_path = str(self.name)+"_logs.txt"
+                            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            with open(log_file_path, "a") as file:
+                                file.write(current_time+" : "+ 'vote request from '+incoming_message.sender+' was refused [old timestamp]' + "\n") 
+
 
                         if (incoming_message.term > self.current_term and difference <= 10 ):
                             self._increment_term(incoming_message.term)
@@ -541,6 +573,12 @@ class RaftNode(threading.Thread):
 
                             if(self.verbose):
                                 print(self._name + ': saw higher term, demoting')
+                                # add the log to the file log (received logs only)
+                                log_file_path = str(self.name)+"_logs.txt"
+                                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                with open(log_file_path, "a") as file:
+                                    file.write(current_time+" : "+ self._name + ': saw higher term, demoting' + "\n") 
+                                
                             return
             
             # Get any pending client requests
