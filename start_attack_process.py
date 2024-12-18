@@ -1,33 +1,30 @@
-#!/usr/bin/env python
-from raft import RaftNode
-import json
-import time
+import socket
 
-address_book_fname = 'address_book.json'
+def send_command(command):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+        try:
+            client_socket.connect(('localhost', 9999))  # Connect to the main script
+            client_socket.sendall(command.encode('utf-8'))
+            response = client_socket.recv(1024).decode('utf-8')
+            return response
+        except ConnectionRefusedError:
+            return "error: unable to connect to the main script"
 
 if __name__ == '__main__':
-    d = {"node1": {"ip": "192.46.237.85", "port": "2380"}, 
-         "node2": {"ip": "172.105.85.119", "port": "2380"}, 
-         "node3": {"ip": "172.104.149.60", "port": "2380"}}
-        
-    with open(address_book_fname, 'w') as outfile:
-        json.dump(d, outfile)
+    print("Interactive Command Sender")
+    print("Type 'exit' to quit.")
+    print("Available commands:")
+    print("  replayattack bypass true")
+    print("  replayattack bypass false")
+    print("  entryattack \"Your message here\"")
+    print("  stop")
+    print()
 
-    s0 = RaftNode(address_book_fname, 'node3', 'follower')
+    while True:
+        user_input = input("Enter command: ").strip()
+        if user_input.lower() == "exit":
+            print("Exiting command sender.")
+            break
 
-    s0.start()
-    
-
-    # after 20 seconds, this node will send the malicious request based on captured vote requests "vote_request.json"
-    time.sleep(20)
-    s0.replay_attack(bypass_timestamp=False)
-
-    # after 20 seconds, this node will send a malicious message to the other follower nodes
-    time.sleep(20)
-    s0.send_entry_attack("Malicious entry")
-
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        s0.stop()
+        response = send_command(user_input)
+        print(f"Response: {response}")
