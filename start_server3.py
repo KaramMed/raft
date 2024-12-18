@@ -14,7 +14,6 @@ def handle_commands(s0):
         while True:
             conn, addr = server_socket.accept()
             with conn:
-                print(f"Connected by {addr}")
                 data = conn.recv(1024)
                 if not data:
                     continue

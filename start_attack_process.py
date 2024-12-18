@@ -11,13 +11,10 @@ def send_command(command):
             return "error: unable to connect to the main script"
 
 if __name__ == '__main__':
-    print("Interactive Command Sender")
-    print("Type 'exit' to quit.")
     print("Available commands:")
     print("  replayattack bypass true")
     print("  replayattack bypass false")
     print("  entryattack \"Your message here\"")
-    print("  stop")
     print()
 
     while True:
