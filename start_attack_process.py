@@ -19,12 +19,12 @@ if __name__ == '__main__':
     
 
     # after 20 seconds, this node will send the malicious request based on captured vote requests "vote_request.json"
-    #time.sleep(20)
-    #s0.replay_attack(bypass_timestamp=False)
+    time.sleep(20)
+    s0.replay_attack(bypass_timestamp=False)
 
     # after 20 seconds, this node will send a malicious message to the other follower nodes
-    #time.sleep(20)
-    #s0.send_entry_attack("Malicious entry")
+    time.sleep(20)
+    s0.send_entry_attack("Malicious entry")
 
     try:
         while True:
