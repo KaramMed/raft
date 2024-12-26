@@ -232,7 +232,7 @@ class RaftNode(threading.Thread):
                     elif (incoming_message.type == MessageType.AppendEntries):
 
                         # Added: display append entry received
-                        print(str(self.name)+": log received ",incoming_message.entries)
+                        print(str(self.name)+": log received ",incoming_message.entries['entry'])
 
                         # add the log to the file log (received logs only)
                         log_file_path = str(self.name)+"_logs.txt"
