@@ -24,4 +24,3 @@ if __name__ == '__main__':
             break
 
         response = send_command(user_input)
-        print(f"Response: {response}")
