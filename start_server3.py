@@ -23,21 +23,21 @@ def handle_commands(s0):
                     if command.startswith("replayattack bypass "):
                         _, _, bypass_value = command.split(maxsplit=2)
                         bypass = bypass_value.lower() == "true"
-                        print(f"Executing replay attack with bypass_timestamp={bypass}")
+                        #print(f"Executing replay attack with bypass_timestamp={bypass}")
                         s0.replay_attack(bypass_timestamp=bypass)
-                        conn.sendall(b"replayattack executed successfully")
+                        #conn.sendall(b"replayattack executed successfully")
 
                     elif command.startswith("entryattack "):
                         _, message = command.split(maxsplit=1)
-                        print(f"Executing log replication attack with message: {message}")
+                        #print(f"Executing log replication attack with message: {message}")
                         s0.send_entry_attack(message)
-                        conn.sendall(b"entryattack executed successfully")
+                        #conn.sendall(b"entryattack executed successfully")
 
                     else:
                         conn.sendall(b"error: invalid command")
                 except Exception as e:
                     print(f"Error handling command '{command}': {e}")
-                    conn.sendall(b"error: failed to execute command")
+                    #conn.sendall(b"error: failed to execute command")
 
 if __name__ == '__main__':
     d = {"node1": {"ip": "192.46.237.85", "port": "2380"},
