@@ -238,7 +238,7 @@ class RaftNode(threading.Thread):
                         log_file_path = str(self.name)+"_logs.txt"
                         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         with open(log_file_path, "a") as file:
-                            file.write(current_time+" : "+ str(incoming_message.entries) + "\n") 
+                            file.write("Append entry received : "+current_time+" : "+ str(incoming_message.entries) + "\n") 
                         
                         # Reply false if message term is less than current_term, this is an invalid entry
                         if (incoming_message.term < self.current_term):
@@ -337,6 +337,7 @@ class RaftNode(threading.Thread):
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             with open(log_file_path, "a") as file:
                 file.write(current_time+" : "+ str(self._name) + ': became candidate' + "\n") 
+                file.write(current_time+" : "+ str(self._name) + ': sent votes requests' + "\n") 
 
         # If you're a candidate, then this is a new term
         self._increment_term()
@@ -375,7 +376,7 @@ class RaftNode(threading.Thread):
                         log_file_path = str(self.name)+"_logs.txt"
                         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         with open(log_file_path, "a") as file:
-                            file.write(current_time+" : "+ f"{self.name}: got accepted votes [{votes_for_me}]" + "\n") 
+                            file.write(current_time+" : "+ f"{self.name}: received vote requests acceptance [{votes_for_me}]" + "\n") 
                             
                         # If you have a majority, promote yourself
                         # Added: timestamp is not old
